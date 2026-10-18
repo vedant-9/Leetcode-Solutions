@@ -1,5 +1,3 @@
-// https://leetcode.com/problems/construct-binary-tree-from-inorder-and-postorder-traversal
-
 /**
  * Definition for a binary tree node.
  * struct TreeNode {
@@ -13,16 +11,42 @@
  */
 class Solution {
 public:
-    TreeNode *Tree(vector<int>& in, int x, int y,vector<int>& po,int a,int b){
-        if(x > y || a > b)return nullptr;
-        TreeNode *node = new TreeNode(po[b]);
-        int SI = x;  
-        while(node->val != in[SI])SI++;
-        node->left  = Tree(in,x,SI-1,po,a,a+SI-x-1);
-        node->right = Tree(in,SI+1,y,po,a+SI-x,b-1);
-        return node;
+    TreeNode* buildTree(vector<int>& inorder, vector<int>& postorder) {
+        // Map each value to its index in inorder for O(1) root lookup.
+        unordered_map<int, int> inorderIndex;
+        for (int i = 0; i < inorder.size(); i++)
+            inorderIndex[inorder[i]] = i;
+
+        return build(inorder, 0, inorder.size() - 1, postorder, 0, postorder.size() - 1, inorderIndex);
     }
-    TreeNode* buildTree(vector<int>& in, vector<int>& po){
-        return Tree(in,0,in.size()-1,po,0,po.size()-1);
+
+private:
+    TreeNode* build(vector<int>& inorder,   int inStart,   int inEnd,
+                    vector<int>& postorder, int postStart, int postEnd,
+                    unordered_map<int, int>& inorderIndex) {
+        if (inStart > inEnd) return nullptr;
+
+        // In postorder, the LAST element of the range is the subtree's root.
+        int rootVal = postorder[postEnd];
+        TreeNode* root = new TreeNode(rootVal);
+
+        // Find the root in inorder. Everything left of it is the left
+        // subtree, everything right is the right subtree.
+        int rootIdx = inorderIndex[rootVal];
+        int leftSize = rootIdx - inStart;
+
+        // Left subtree: inorder [inStart, rootIdx-1],
+        //               postorder [postStart, postStart+leftSize-1]
+        root->left = build(inorder, inStart, rootIdx - 1,
+                           postorder, postStart, postStart + leftSize - 1,
+                           inorderIndex);
+
+        // Right subtree: inorder [rootIdx+1, inEnd],
+        //                postorder [postStart+leftSize, postEnd-1]
+        root->right = build(inorder, rootIdx + 1, inEnd,
+                            postorder, postStart + leftSize, postEnd - 1,
+                            inorderIndex);
+
+        return root;
     }
 };
