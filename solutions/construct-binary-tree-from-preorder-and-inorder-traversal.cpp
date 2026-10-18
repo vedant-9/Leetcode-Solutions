@@ -1,5 +1,3 @@
-// https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal
-
 /**
  * Definition for a binary tree node.
  * struct TreeNode {
@@ -13,31 +11,35 @@
  */
 class Solution {
 public:
-    vector<int> pre,in;
-    TreeNode* build(int ps, int pe, int is, int ie)
-    {
-        if(ps>pe)
-            return NULL;
-        TreeNode* node = new TreeNode(pre[ps]);
-        int pos;
-        for(int i = is; i <= ie; i++)
-        {
-            if(in[i] == node->val)
-            {
-                pos = i;
-                break;
-            }
+    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+        // map to lookup current node index in inorder array
+        map<int, int> inorderIndex;
+        for(int i = 0; i < inorder.size(); i++) {
+            inorderIndex[inorder[i]] = i;
         }
-        node->left = build(ps + 1, ps + pos - is, is, pos - 1);
-        node->right = build(pe - ie + pos + 1, pe, pos + 1, ie);
-        return node;
+        return build(inorder, 0, inorder.size()-1, preorder, 0, preorder.size()-1, inorderIndex);
     }
-    
-    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) 
-    {
-        pre = preorder;
-        in = inorder;
-        int n = pre.size();
-        return build(0,n-1,0,n-1);
+private:
+    TreeNode* build(vector<int> & inorder, int inStart, int inEnd,
+                        vector<int> & preorder, int preStart, int preEnd,
+                        map<int, int> & inorderIndex) {
+        if(inStart > inEnd) return nullptr;
+
+        TreeNode* root = new TreeNode(preorder[preStart]);
+
+        // lookup the index for root in inorder array
+        int rootIdx = inorderIndex[root->val];
+
+        int leftSubtreeSize = rootIdx - inStart;
+
+        // Build left subtree
+        root->left = build(inorder, inStart, inStart + leftSubtreeSize - 1,
+                            preorder, preStart+1, preStart + leftSubtreeSize, inorderIndex);
+
+        // Build right subtree
+        root->right = build(inorder, rootIdx+1, inEnd,
+                            preorder, preStart + leftSubtreeSize + 1, preEnd, inorderIndex);
+
+        return root;
     }
 };
