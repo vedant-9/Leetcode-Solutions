@@ -1,28 +1,17 @@
-// https://leetcode.com/problems/longest-common-prefix
-
 class Solution {
 public:
-    string longestCommonPrefix(vector<string>& v) 
-    {
-        int i=0;
-        for(;i<v[0].size();i++)
-        {
-            int f=0;
-            char c = v[0][i];
-            for(int j=1;j<v.size();j++)
-            {
-                if(i>=v[j].size() || c!=v[j][i])
-                {
-                    f=1;
-                    break;
-                }
-                
+    string longestCommonPrefix(vector<string>& strs) {
+        // TC - O(n)
+        // SC - O(1)
+        string res = "";
+        for (int i = 0; i < strs[0].size(); i++) {
+            char ch = strs[0][i];
+            for (auto s : strs) {
+                if (i >= s.size() or s[i] != ch)
+                    return res;
             }
-            if(f==1)
-            {
-                break;
-            }
+            res += ch;
         }
-        return v[0].substr(0,i);
+        return res;
     }
 };
