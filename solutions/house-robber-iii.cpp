@@ -1,5 +1,3 @@
-// https://leetcode.com/problems/house-robber-iii
-
 /**
  * Definition for a binary tree node.
  * struct TreeNode {
@@ -12,20 +10,21 @@
  * };
  */
 class Solution {
-public:
-    int tryRob(TreeNode* root, int& l, int& r) {
-        if (!root)
-            return 0;
-            
-        int ll = 0, lr = 0, rl = 0, rr = 0;
-        l = tryRob(root->left, ll, lr);
-        r = tryRob(root->right, rl, rr);
-        
-        return max(root->val + ll + lr + rl + rr, l + r);
+    pair<int, int> dfs(TreeNode* node) {
+        if (!node) return {0, 0};
+
+        auto [robL, skipL] = dfs(node->left);
+        auto [robR, skipR] = dfs(node->right);
+
+        int robHere  = node->val + skipL + skipR;
+        int skipHere = max(robL, skipL) + max(robR, skipR);
+
+        return {robHere, skipHere};
     }
 
+public:
     int rob(TreeNode* root) {
-        int l, r;
-        return tryRob(root, l, r);
+        auto [robRoot, skipRoot] = dfs(root);
+        return max(robRoot, skipRoot);
     }
 };
