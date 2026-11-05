@@ -13,7 +13,7 @@ public:
     // printFizz() outputs "fizz".
     void fizz(function<void()> printFizz) {
         unique_lock<mutex> lock(m);
-        while(i <= n) {
+        while(true) {
             cv.wait(lock, [this]{ return i > n or (i % 3 == 0 and i % 5 != 0); });
             if(i > n) return;
             printFizz();
@@ -25,7 +25,7 @@ public:
     // printBuzz() outputs "buzz".
     void buzz(function<void()> printBuzz) {
         unique_lock<mutex> lock(m);
-        while(i <= n) {
+        while(true) {
             cv.wait(lock, [this]{ return i > n or (i % 3 != 0 and i % 5 == 0); });
             if(i > n) return;
             printBuzz();
@@ -37,7 +37,7 @@ public:
     // printFizzBuzz() outputs "fizzbuzz".
 	void fizzbuzz(function<void()> printFizzBuzz) {
         unique_lock<mutex> lock(m);
-        while(i <= n) {
+        while(true) {
             cv.wait(lock, [this]{ return i > n or (i % 3 == 0 and i % 5 == 0); });
             if(i > n) return;
             printFizzBuzz();
@@ -49,7 +49,7 @@ public:
     // printNumber(x) outputs "x", where x is an integer.
     void number(function<void(int)> printNumber) {
         unique_lock<mutex> lock(m);
-        while(i <= n) {
+        while(true) {
             cv.wait(lock, [this]{ return i > n or (i % 3 != 0 and i % 5 != 0); });
             if(i > n) return;
             printNumber(i);
